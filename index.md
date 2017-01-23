@@ -1,4 +1,4 @@
-```
+```cpp
 #include <iostream>
 #include <windows.h>
 #include <opencv2/opencv.hpp>
