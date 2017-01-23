@@ -5,19 +5,22 @@
 
 int main()
 {
-    typedef void*(*Create)(const char *);
-    typedef void(*Correct)(void *, unsigned char *, unsigned char *);
+    typedef void*(*Create)();
+    typedef int(*Init)(void *, const char *);
+    typedef int(*Correct)(void *, unsigned char *, unsigned char *);
     HINSTANCE hInstLibrary = LoadLibrary(L"boardEye.dll");
 
-    Create create = (Create)GetProcAddress(hInstLibrary, "createCorrector");
+    Create create = (Create)GetProcAddress(hInstLibrary, "create");
+    Init init = (Init)GetProcAddress(hInstLibrary, "init");
     Correct correct = (Correct)GetProcAddress(hInstLibrary, "correct");
 
-    cv::Mat inputImg = cv::imread("../../var/test.jpg");
+    cv::Mat inputImg = cv::imread("test.jpg");
     cv::Mat outputImg(800, 1600, CV_8UC3);
 
-    void* corrector = create("../../var/param.yml");
-    correct(corrector, inputImg.data, outputImg.data);
-    cv::imwrite("../../var/result.jpg", outputImg);
+    void* corrector = create();
+    int initStatus = init(corrector, "param.yml");
+    int correctStatus = correct(corrector, inputImg.data, outputImg.data);
+    cv::imwrite("result.jpg", outputImg);
 
     FreeLibrary(hInstLibrary);
 
